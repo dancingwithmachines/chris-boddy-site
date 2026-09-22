@@ -126,7 +126,7 @@ void main(){
     scale:3.62, stretch:1.00, angle:0, offset:0.50,
     detail:3, rough:1.10, warp:0.41,
     soft:11.0, disp:0.260, chroma:0.80, shape:0.85, coreMix:0.00, intensity:0.75,
-    speed:0.60, seed:161.91636, text:true
+    speed:0.50, seed:161.91636, text:true
   };
 
   const PARAMS = [
