@@ -38,6 +38,7 @@
     line-height:1.14; letter-spacing:-0.005em;
     text-wrap:balance;
   }
+  .type[hidden]{display:none}
   .type h1, .type p{margin:0; font-size:1em}
   .type h1{font-weight:600; color:#222222}
   .type p{font-weight:400; color:#ffffff}
@@ -109,10 +110,10 @@
   .hint{font-size:11.5px; line-height:1.5; color:var(--faint); margin:2px 0 0}
 
   .actions{
-    flex:0 0 auto; display:flex; gap:8px; padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));
+    flex:0 0 auto; display:flex; flex-wrap:wrap; gap:8px; padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));
     border-top:1px solid var(--line);
   }
-  .actions button{flex:1}
+  .actions button{flex:1 1 auto; min-width:62px; padding:6px 8px}
 
   details.glsl{margin-top:14px}
   details.glsl summary{
@@ -144,7 +145,7 @@
 <div id="app">
   <div class="stage" id="stage">
     <canvas id="gl"></canvas>
-    <div class="type">
+    <div class="type" id="typeBlock">
       <h1>Chris Boddy.</h1>
       <p>Copywriting, narrative<br>and voice strategy.</p>
     </div>
@@ -185,6 +186,7 @@
     </div>
 
     <div class="actions">
+      <button type="button" id="textBtn" aria-pressed="true">Text</button>
       <button type="button" id="playBtn">Pause</button>
       <button type="button" id="shuffleBtn">Shuffle</button>
       <button type="button" id="resetBtn">Reset</button>
@@ -335,7 +337,7 @@ void main(){
     scale:3.62, stretch:1.00, angle:0, offset:0.50,
     detail:3, rough:1.10, warp:0.26,
     soft:11.0, disp:0.260, chroma:0.50, shape:0.85, coreMix:0.20, intensity:1.00,
-    speed:0.70, seed:161.91636
+    speed:0.70, seed:161.91636, text:true
   };
   const state = Object.assign({}, DEFAULTS);
 
@@ -492,7 +494,9 @@ void main(){
         colCore = document.getElementById('colCore'),
         colBg = document.getElementById('colBg'),
         playBtn = document.getElementById('playBtn'),
-        glslOut = document.getElementById('glslOut');
+        glslOut = document.getElementById('glslOut'),
+        typeBlock = document.getElementById('typeBlock'),
+        textBtn = document.getElementById('textBtn');
 
   [[colA,'a'],[colB,'b'],[colCore,'core'],[colBg,'bg']].forEach(function(pair){
     pair[0].addEventListener('input', function(){
@@ -501,6 +505,9 @@ void main(){
     });
   });
 
+  textBtn.addEventListener('click', function(){
+    state.text = !state.text; syncChrome(); save();
+  });
   playBtn.addEventListener('click', function(){
     playing = !playing;
     playBtn.textContent = playing ? 'Pause' : 'Play';
@@ -560,6 +567,9 @@ void main(){
     document.documentElement.style.setProperty('--ov-ink', light ? 'rgba(18,18,20,.92)' : 'rgba(255,255,255,.95)');
     document.documentElement.style.setProperty('--ov-dim', light ? 'rgba(18,18,20,.55)' : 'rgba(255,255,255,.58)');
     document.documentElement.style.setProperty('--ov-shadow', light ? 'rgba(255,255,255,.55)' : 'rgba(0,0,0,.55)');
+    typeBlock.hidden = !state.text;
+    textBtn.setAttribute('aria-pressed', String(state.text));
+    textBtn.textContent = state.text ? 'Text' : 'Text off';
     glslOut.textContent = exportGLSL();
   }
 
