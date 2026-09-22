@@ -331,7 +331,7 @@ void main(){
     {k:'speed',     label:'Flow',       min:0,    max:3,    step:0.01,  dp:2, group:'motion'}
   ];
 
-  const STORE = 'dispersion-field-v5';
+  const STORE = 'dispersion-field-v6';
   const DEFAULTS = {
     a:'#6a3cff', core:'#ffffff', b:'#4dd2ff', bg:'#e3e3e3',
     scale:3.62, stretch:1.00, angle:0, offset:0.50,
@@ -608,25 +608,32 @@ void main(){
     return head + lines + tail;
   }
 
+  // Save the state alongside the DEFAULTS it was built on. On load we compare
+  // the two: a value you changed is kept, but a value whose DEFAULT moved since
+  // you saved adopts the new default. Otherwise old saved state silently masks
+  // every future change to DEFAULTS, which looks exactly like a failed deploy.
   function save(){
-    try{ localStorage.setItem(STORE, JSON.stringify(state)); }catch(e){}
+    try{
+      localStorage.setItem(STORE, JSON.stringify({state:state, base:DEFAULTS}));
+    }catch(e){}
   }
   try{
     const raw = localStorage.getItem(STORE);
     if(raw){
-      const saved = JSON.parse(raw);
-      // Clamp every slider into its CURRENT range. Parameters have been
-      // repurposed across versions, and a stale value that now sits far outside
-      // its range renders a dead frame rather than something merely odd.
+      const parsed = JSON.parse(raw);
+      const saved = parsed && parsed.state ? parsed.state : parsed;   // pre-v6 shape
+      const base  = parsed && parsed.base  ? parsed.base  : null;
       const range = {};
       PARAMS.forEach(function(q){ range[q.k] = q; });
       Object.keys(state).forEach(function(k){
         if(typeof saved[k] !== typeof state[k]) return;
+        // the default moved since this was saved — the new default wins
+        if(base && base[k] !== DEFAULTS[k]) return;
         let v = saved[k];
         if(typeof v === 'number'){
           if(!isFinite(v)) return;
           const q = range[k];
-          if(q) v = Math.min(q.max, Math.max(q.min, v));
+          if(q) v = Math.min(q.max, Math.max(q.min, v));   // clamp to the live range
         }
         state[k] = v;
       });
