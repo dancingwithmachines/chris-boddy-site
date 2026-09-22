@@ -35,13 +35,15 @@
     font-family:Poppins, system-ui, -apple-system, sans-serif;
     /* 60pt at full size, stepped down so it still fits a phone */
     font-size:clamp(24px, 5.5vw, 60pt);
-    line-height:1.14; letter-spacing:-0.005em;
+    line-height:1.14; letter-spacing:-0.01em;
     text-wrap:balance;
   }
   .type[hidden]{display:none}
   .type h1, .type p{margin:0; font-size:1em}
   .type h1{font-weight:600; color:#708391}
-  .type p{font-weight:400; color:#ffffff}
+  /* the two blocks sit flush, so their spacing is the 1.14 line box;
+     0.228em adds 20% to it */
+  .type p{font-weight:400; color:#ffffff; margin-top:0.228em}
 
 
   /* ---------- panel ---------- */
@@ -336,7 +338,7 @@ void main(){
     a:'#6a3cff', core:'#ffffff', b:'#4dd2ff', bg:'#e3e3e3',
     scale:3.62, stretch:1.00, angle:0, offset:0.50,
     detail:3, rough:1.10, warp:0.41,
-    soft:11.0, disp:0.260, chroma:0.65, shape:0.85, coreMix:0.00, intensity:0.75,
+    soft:11.0, disp:0.260, chroma:0.80, shape:0.85, coreMix:0.00, intensity:0.75,
     speed:0.70, seed:161.91636, text:true
   };
   const state = Object.assign({}, DEFAULTS);
