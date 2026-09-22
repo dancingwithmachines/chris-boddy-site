@@ -1,0 +1,47 @@
+/* Shared visual layer: the self-hosted face, the stage, and the type over it.
+   Both index.html and tuner.html link this, so the typography cannot drift
+   between the site and the tool. */
+
+@font-face{
+  font-family:Poppins;
+  font-style:normal;
+  font-weight:400;
+  font-display:swap;
+  src:url('fonts/poppins-400.woff2') format('woff2');
+}
+@font-face{
+  font-family:Poppins;
+  font-style:normal;
+  font-weight:600;
+  font-display:swap;
+  src:url('fonts/poppins-600.woff2') format('woff2');
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0; background:#e3e3e3}
+
+.stage{position:relative; overflow:hidden; background:#e3e3e3}
+.stage canvas{position:absolute; inset:0; width:100%; height:100%; display:block}
+
+.type{
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center;
+  padding:24px; pointer-events:none;
+  font-family:Poppins, system-ui, -apple-system, sans-serif;
+  /* 60pt at full size, stepped down so it still fits a phone */
+  font-size:clamp(24px, 5.5vw, 60pt);
+  line-height:1.14; letter-spacing:-0.01em;
+  text-wrap:balance;
+}
+.type[hidden]{display:none}
+.type h1, .type p{margin:0; font-size:1em}
+.type h1{font-weight:600; color:#708391}
+/* the two blocks sit flush, so their spacing is the 1.14 line box;
+   0.228em adds 20% to it */
+.type p{font-weight:400; color:#ffffff; margin-top:0.228em}
+
+.fail{
+  padding:40px 24px; max-width:44ch; margin:auto; line-height:1.6;
+  font-family:Poppins, system-ui, sans-serif; color:#6f6f6f;
+}
