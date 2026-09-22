@@ -33,23 +33,15 @@
     align-items:center; justify-content:center; text-align:center;
     padding:24px; pointer-events:none;
     font-family:Poppins, system-ui, -apple-system, sans-serif;
-    /* 70pt at full size, stepped down so it still fits a phone */
-    font-size:clamp(26px, 6.4vw, 70pt);
+    /* 60pt at full size, stepped down so it still fits a phone */
+    font-size:clamp(24px, 5.5vw, 60pt);
     line-height:1.14; letter-spacing:-0.005em;
     text-wrap:balance;
   }
   .type h1, .type p{margin:0; font-size:1em}
-  .type h1{font-weight:600; color:#67cdcc}
-  .type p{font-weight:400; color:#6f6f6f}
+  .type h1{font-weight:600; color:#222222}
+  .type p{font-weight:400; color:#ffffff}
 
-  .readout{
-    position:absolute; left:0; bottom:0; display:flex; gap:14px; flex-wrap:wrap;
-    padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));
-    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:10.5px;
-    letter-spacing:.06em; text-transform:uppercase; color:var(--ov-dim);
-    pointer-events:none;
-  }
-  .readout b{font-weight:500; color:var(--ov-ink)}
 
   /* ---------- panel ---------- */
   .panel{
@@ -156,7 +148,6 @@
       <h1>Chris Boddy.</h1>
       <p>Copywriting, narrative<br>and voice strategy.</p>
     </div>
-    <div class="readout" id="readout"></div>
   </div>
 
   <aside class="panel">
@@ -500,7 +491,6 @@ void main(){
         colB = document.getElementById('colB'),
         colCore = document.getElementById('colCore'),
         colBg = document.getElementById('colBg'),
-        readout = document.getElementById('readout'),
         playBtn = document.getElementById('playBtn'),
         glslOut = document.getElementById('glslOut');
 
@@ -561,7 +551,7 @@ void main(){
     syncChrome();
   }
 
-  // everything that follows the chosen Ground: panel skin, readout, GLSL export
+  // everything that follows the chosen Ground: panel skin and GLSL export
   function syncChrome(){
     const L = luma(state.bg);
     const light = L > 0.42;
@@ -570,11 +560,6 @@ void main(){
     document.documentElement.style.setProperty('--ov-ink', light ? 'rgba(18,18,20,.92)' : 'rgba(255,255,255,.95)');
     document.documentElement.style.setProperty('--ov-dim', light ? 'rgba(18,18,20,.55)' : 'rgba(255,255,255,.58)');
     document.documentElement.style.setProperty('--ov-shadow', light ? 'rgba(255,255,255,.55)' : 'rgba(0,0,0,.55)');
-    readout.innerHTML =
-      '<span>Cool <b>' + state.a + '</b></span>' +
-      '<span>Warm <b>' + state.b + '</b></span>' +
-      '<span>Ground <b>' + state.bg + '</b></span>' +
-      '<span>Dispersion <b>' + state.disp.toFixed(2) + '</b></span>';
     glslOut.textContent = exportGLSL();
   }
 
