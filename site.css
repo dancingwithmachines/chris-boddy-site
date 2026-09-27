@@ -43,6 +43,7 @@
   --fs-label:clamp(12pt, 1.78vw, 16pt);
 
   --gutter:clamp(20px, 5vw, 64px);
+  --panel-pad:clamp(44px, 5.4vw, 88px);   /* space under a panel's copy */
   --veil:clamp(36px, 5vh, 72px);   /* softened edge while a panel moves */
   color-scheme:light;
 }
@@ -124,7 +125,8 @@ img{max-width:100%; display:block}
   font-family:inherit; font-size:var(--fs-label); font-weight:600;
   letter-spacing:.10em; text-transform:uppercase;
   /* the colour rollover is linear; only the label colour carries the easing */
-  transition:background-color 150ms linear, color var(--dur) var(--ease);
+  transition:background-color 150ms linear, color var(--dur) var(--ease),
+             height var(--dur) var(--ease), padding var(--dur) var(--ease);
 }
 .panel-head:hover{background:var(--blue-hover)}
 .panel-head:focus-visible{outline:2px solid var(--ink-dark); outline-offset:-4px}
@@ -151,7 +153,11 @@ img{max-width:100%; display:block}
    copy. Fading the colour rather than hiding the text keeps the head clickable
    to close it, holds the layout still, and leaves the label readable to screen
    readers. It rides the same colour transition as every other head. */
-#panel-intro.is-open > .panel-head{color:transparent}
+#panel-intro.is-open > .panel-head{
+  color:transparent;
+  /* the title has gone, so what is left is space: match the space below the copy */
+  height:var(--panel-pad); padding-top:0; padding-bottom:0; overflow:hidden;
+}
 
 /* the 0fr -> 1fr grid transition animates height without measuring it in JS */
 .panel-body{
@@ -169,7 +175,7 @@ img{max-width:100%; display:block}
 }
 .panel-inner{
   max-width:1040px; margin:0 auto; text-align:center;
-  padding:0 var(--gutter) clamp(44px, 5.4vw, 88px);
+  padding:0 var(--gutter) var(--panel-pad);
   font-size:var(--fs-client); line-height:var(--lh-copy); letter-spacing:-0.005em;
   opacity:0; transition:opacity var(--dur) var(--ease);
 }
