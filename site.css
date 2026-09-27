@@ -206,6 +206,9 @@ img{max-width:100%; display:block}
   .outro p{max-width:24ch}
 }
 
+/* Used for a beat while JS measures a settled layout; see closedHeadHeight(). */
+.measuring, .measuring *{transition:none !important}
+
 @media (prefers-reduced-motion:reduce){
   *{transition-duration:1ms !important}
 }

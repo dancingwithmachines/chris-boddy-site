@@ -41,6 +41,24 @@
     const c = clipOf(p);
     return c ? c.getBoundingClientRect().height : 0;
   }
+  // A closing panel does not only lose its body: the introduction head grows
+  // back from the collapsed measure to its full height as the title returns.
+  // That has to be in the arithmetic below, or the scroll lands short and the
+  // copy appears to jump. Read with transitions off, so the rect is the
+  // settled height rather than a frame of the tween, and flush the reflow
+  // before restoring them so the real transition still starts from the open
+  // state.
+  function closedHeadHeight(p){
+    const head = headOf(p);
+    if(!p.classList.contains('is-open')) return head.getBoundingClientRect().height;
+    document.body.classList.add('measuring');
+    p.classList.remove('is-open');
+    const h = head.getBoundingClientRect().height;
+    p.classList.add('is-open');
+    void head.offsetHeight;
+    document.body.classList.remove('measuring');
+    return h;
+  }
   function docTop(el){ return el.getBoundingClientRect().top + window.scrollY; }
 
   let scrollToken = 0;
@@ -92,6 +110,7 @@
     let target = docTop(panel);
     if(current && panels.indexOf(current) < panels.indexOf(panel)){
       target -= openHeight(current);
+      target += closedHeadHeight(current) - headOf(current).getBoundingClientRect().height;
     }
 
     if(current) setOpen(current, false);
