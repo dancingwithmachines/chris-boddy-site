@@ -123,10 +123,10 @@ img{max-width:100%; display:block}
   padding:clamp(26px, 3.4vw, 44px) var(--gutter);
   background:var(--blue); color:var(--white); cursor:pointer;
   font-family:inherit; font-size:var(--fs-label); font-weight:600;
-  letter-spacing:.10em; text-transform:uppercase;
+  letter-spacing:.10em; text-transform:uppercase; line-height:1.5;
   /* the colour rollover is linear; only the label colour carries the easing */
   transition:background-color 150ms linear, color var(--dur) var(--ease),
-             height var(--dur) var(--ease), padding var(--dur) var(--ease);
+             padding var(--dur) var(--ease), line-height var(--dur) var(--ease);
 }
 .panel-head:hover{background:var(--blue-hover)}
 .panel-head:focus-visible{outline:2px solid var(--ink-dark); outline-offset:-4px}
@@ -153,10 +153,21 @@ img{max-width:100%; display:block}
    copy. Fading the colour rather than hiding the text keeps the head clickable
    to close it, holds the layout still, and leaves the label readable to screen
    readers. It rides the same colour transition as every other head. */
+/* Unlike the others, this head changes size as well as colour when it opens and
+   closes. At the shared 150ms its blue arrived while it was still two thirds
+   grown, reading as a stray bar. is-moving is only present while the panel is
+   in motion, so this slows the colour to the panel's own timing without
+   touching the 150ms rollover. */
+#panel-intro.is-moving > .panel-head{
+  transition:background-color var(--dur) var(--ease), color var(--dur) var(--ease),
+             padding var(--dur) var(--ease), line-height var(--dur) var(--ease);
+}
+
 #panel-intro.is-open > .panel-head{
-  color:transparent;
+  color:transparent; line-height:0;
   /* the title has gone, so what is left is space: match the space below the copy */
-  height:var(--panel-pad); padding-top:0; padding-bottom:0; overflow:hidden;
+  padding-top:calc(var(--panel-pad) / 2);
+  padding-bottom:calc(var(--panel-pad) / 2);
 }
 
 /* the 0fr -> 1fr grid transition animates height without measuring it in JS */
