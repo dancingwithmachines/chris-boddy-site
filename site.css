@@ -147,6 +147,12 @@ img{max-width:100%; display:block}
 .panel.is-open > .panel-head{background:var(--white); color:var(--label-open)}
 .panel.is-open > .panel-head:hover{background:var(--white)}
 
+/* The introduction panel alone drops its title once open, leaving only the
+   copy. Fading the colour rather than hiding the text keeps the head clickable
+   to close it, holds the layout still, and leaves the label readable to screen
+   readers. It rides the same colour transition as every other head. */
+#panel-intro.is-open > .panel-head{color:transparent}
+
 /* the 0fr -> 1fr grid transition animates height without measuring it in JS */
 .panel-body{
   display:grid; grid-template-rows:0fr; background:var(--white);
