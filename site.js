@@ -44,19 +44,40 @@
   // A closing panel does not only lose its body: the introduction head grows
   // back from the collapsed measure to its full height as the title returns.
   // That has to be in the arithmetic below, or the scroll lands short and the
-  // copy appears to jump. Read with transitions off, so the rect is the
-  // settled height rather than a frame of the tween, and flush the reflow
-  // before restoring them so the real transition still starts from the open
-  // state.
+  // copy appears to jump.
+  //
+  // Taking the reading means briefly putting the panel in its closed state,
+  // which would collapse its body. If that leaves the document shorter than
+  // the current scroll position the browser clamps the scroll to fit, and
+  // restoring the panel does not give those pixels back — the page lurches.
+  // So the body is held at its present height for the reading, and the scroll
+  // put back afterwards in case anything moved it anyway. Both happen inside
+  // one task with transitions off, so no frame is ever painted mid-measure.
+  const headCache = new WeakMap();
   function closedHeadHeight(p){
     const head = headOf(p);
     if(!p.classList.contains('is-open')) return head.getBoundingClientRect().height;
+
+    const cached = headCache.get(p);
+    if(cached && cached.width === window.innerWidth) return cached.height;
+
+    const body = p.querySelector('.panel-body');
+    const held = body.getBoundingClientRect().height;
+    const scroll = window.scrollY;
+
     document.body.classList.add('measuring');
+    body.style.height = held + 'px';
     p.classList.remove('is-open');
+
     const h = head.getBoundingClientRect().height;
+
     p.classList.add('is-open');
+    body.style.height = '';
+    if(window.scrollY !== scroll) window.scrollTo(0, scroll);
     void head.offsetHeight;
     document.body.classList.remove('measuring');
+
+    headCache.set(p, {width: window.innerWidth, height: h});
     return h;
   }
   function docTop(el){ return el.getBoundingClientRect().top + window.scrollY; }
