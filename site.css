@@ -1,47 +1,239 @@
-/* Shared visual layer: the self-hosted face, the stage, and the type over it.
-   Both index.html and tuner.html link this, so the typography cannot drift
-   between the site and the tool. */
+/* ---------------------------------------------------------------------------
+   Chris Boddy — one-page site.
+   Type sizes are given in pt in the design, so they are written as pt here and
+   interpolated with clamp(): the low end is the mobile figure, the high end the
+   desktop one, so both land exactly rather than being approximated.
+   --------------------------------------------------------------------------- */
 
 @font-face{
-  font-family:Poppins;
-  font-style:normal;
-  font-weight:400;
-  font-display:swap;
+  font-family:Poppins; font-style:normal; font-weight:400; font-display:swap;
   src:url('fonts/poppins-400.woff2') format('woff2');
 }
 @font-face{
-  font-family:Poppins;
-  font-style:normal;
-  font-weight:600;
-  font-display:swap;
+  font-family:Poppins; font-style:normal; font-weight:600; font-display:swap;
   src:url('fonts/poppins-600.woff2') format('woff2');
 }
 
+:root{
+  --blue:#acc6f0;               /* closed panel */
+  --blue-hover:#a4c0ee;         /* rollover, ~4% darker */
+  --label-open:#a9c2ef;         /* label once the panel is open, on white */
+  --ink:#708391;                /* name and body copy */
+  --ink-dark:#4e5a64;           /* contact / connect — deliberately darker */
+  --white:#ffffff;
+  --ease:cubic-bezier(0.77, 0, 0.175, 1);   /* quart in-out */
+  --dur:620ms;
+
+  /* Sized so "Copywriting, narrative" keeps its line break at every width:
+     the break needs roughly 7.9vw, and it tops out at the designed 60pt. */
+  --fs-hero:clamp(24px, 7.9vw, 56pt);
+  /* mobile 16pt -> desktop 24pt. Same value for both now, kept as two
+     variables so they can diverge again without touching the rules. */
+  --fs-intro:clamp(16pt, 2.67vw, 24pt);
+  --fs-client:clamp(16pt, 2.67vw, 24pt);
+  /* Leading is held at 32pt desktop / 24pt mobile. It has to be an absolute
+     clamp rather than a unitless ratio, because 17/24 on mobile and 24/32 on
+     desktop are different proportions. Used by the panel copy and the footer
+     copy alike. */
+  --lh-copy:clamp(24pt, 3.56vw, 32pt);
+  /* mobile 18pt -> desktop 18pt for the small stuff */
+  --fs-meta:clamp(11pt, 1.1vw, 13pt);
+  /* mobile 12pt -> desktop 16pt. 1.78vw tops out at 1200px, the same width the
+     panel copy reaches its ceiling, so the two settle together. */
+  --fs-label:clamp(12pt, 1.78vw, 16pt);
+
+  --gutter:clamp(20px, 5vw, 64px);
+  --veil:clamp(36px, 5vh, 72px);   /* softened edge while a panel moves */
+  color-scheme:light;
+}
+
 *{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0; background:#e3e3e3}
-
-.stage{position:relative; overflow:hidden; background:#e3e3e3}
-.stage canvas{position:absolute; inset:0; width:100%; height:100%; display:block}
-
-.type{
-  position:absolute; inset:0; display:flex; flex-direction:column;
-  align-items:center; justify-content:center; text-align:center;
-  padding:24px; pointer-events:none;
+html{scroll-behavior:auto}          /* scrolling is tweened in JS, with --ease */
+body{
+  margin:0; background:var(--white); color:var(--ink);
+  /* The scroll is tweened to a position worked out from the panel heights. Scroll
+     anchoring would adjust for the closing panel as well, compensating twice and
+     overshooting the target. */
+  overflow-anchor:none;
   font-family:Poppins, system-ui, -apple-system, sans-serif;
-  /* 60pt at full size, stepped down so it still fits a phone */
-  font-size:clamp(24px, 5.5vw, 60pt);
-  line-height:1.14; letter-spacing:-0.01em;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%; display:block}
+
+/* ---------------- shared field band (header + footer) ---------------- */
+.field{position:relative; overflow:hidden; background:#e3e3e3}
+.field canvas{position:absolute; inset:0; width:100%; height:100%; display:block}
+.field > .inner{position:relative}
+
+/* ---------------- header ---------------- */
+/* 80% of the viewport, so the introduction panel is already breaking the
+   bottom edge on load. svh keeps it honest on phones, where vh counts the
+   address bar that is about to disappear. */
+.hero{height:80vh; height:80svh; display:flex; flex-direction:column}
+.topbar{
+  position:relative; display:flex; justify-content:space-between; align-items:center;
+  gap:16px; padding:clamp(16px, 2.4vw, 30px) var(--gutter);
+  font-size:var(--fs-meta); color:var(--ink-dark);
+}
+.topbar .label{opacity:.95}
+.hero-type{
+  position:relative; flex:1 1 auto; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center;
+  padding:0 var(--gutter) clamp(40px, 6vw, 80px);
+  font-size:var(--fs-hero); line-height:1.14; letter-spacing:-0.01em;
   text-wrap:balance;
 }
-.type[hidden]{display:none}
-.type h1, .type p{margin:0; font-size:1em}
-.type h1{font-weight:600; color:#708391}
+.hero-type h1, .hero-type p{margin:0; font-size:1em}
+.hero-type h1{font-weight:600; color:var(--ink-dark)}
 /* the two blocks sit flush, so their spacing is the 1.14 line box;
    0.228em adds 20% to it */
-.type p{font-weight:400; color:#ffffff; margin-top:0.228em}
+.hero-type p{font-weight:400; color:var(--white); margin-top:0.228em}
 
-.fail{
-  padding:40px 24px; max-width:44ch; margin:auto; line-height:1.6;
-  font-family:Poppins, system-ui, sans-serif; color:#6f6f6f;
+/* ---------------- animated underline ---------------- */
+.ul{
+  position:relative; color:var(--white); text-decoration:none; font-weight:600;
+  padding-bottom:2px;
 }
+.ul::after{
+  content:''; position:absolute; left:0; right:0; bottom:0; height:1.5px;
+  background:currentColor; transform:scaleX(0); transform-origin:left center;
+  transition:transform var(--dur) var(--ease);
+}
+.ul:hover::after, .ul:focus-visible::after{transform:scaleX(1)}
+.ul:focus-visible{outline:2px solid currentColor; outline-offset:4px; border-radius:2px}
+
+/* icon buttons replace the words on narrow screens */
+.icon-links{display:none; gap:10px}
+.icon-links a{
+  width:44px; height:44px; border-radius:50%; background:var(--white);
+  display:grid; place-items:center; color:var(--ink-dark);
+  transition:transform var(--dur) var(--ease);
+}
+.icon-links a:hover{transform:translateY(-2px)}
+.icon-links svg{width:20px; height:20px; fill:currentColor}
+
+/* ---------------- panels ---------------- */
+.panels{background:var(--blue); border-top:1px solid rgba(255,255,255,.6)}
+.panel + .panel > .panel-head{border-top:1px solid rgba(255,255,255,.6)}
+
+.panel-head{
+  -webkit-appearance:none; appearance:none; border:0; margin:0; width:100%;
+  display:flex; align-items:center; justify-content:center; text-align:center;
+  padding:clamp(26px, 3.4vw, 44px) var(--gutter);
+  background:var(--blue); color:var(--white); cursor:pointer;
+  font-family:inherit; font-size:var(--fs-label); font-weight:600;
+  letter-spacing:.10em; text-transform:uppercase;
+  /* the colour rollover is linear; only the label colour carries the easing */
+  transition:background-color 150ms linear, color var(--dur) var(--ease);
+}
+.panel-head:hover{background:var(--blue-hover)}
+.panel-head:focus-visible{outline:2px solid var(--ink-dark); outline-offset:-4px}
+/* The logo is painted with currentColor through an alpha mask, so it simply
+   follows the head's colour — white when closed, pale blue when open — instead
+   of needing a second asset or a filter that only approximates the hue. */
+.logo{
+  /* One height for the row, nudged per mark by --scale. A solid symbol and a
+     thin wordmark set to the same height do not read as the same size, so the
+     scales even out the ink each one carries rather than its box. */
+  height:calc(clamp(26px, 2.6vw, 38px) * var(--scale, 1));
+  aspect-ratio:var(--ratio);
+  background:currentColor;
+  -webkit-mask:var(--src) center/contain no-repeat;
+          mask:var(--src) center/contain no-repeat;
+  transition:background-color var(--dur) var(--ease);
+}
+
+/* open: the head joins the white body and its label goes pale blue */
+.panel.is-open > .panel-head{background:var(--white); color:var(--label-open)}
+.panel.is-open > .panel-head:hover{background:var(--white)}
+
+/* the 0fr -> 1fr grid transition animates height without measuring it in JS */
+.panel-body{
+  display:grid; grid-template-rows:0fr; background:var(--white);
+  transition:grid-template-rows var(--dur) var(--ease);
+}
+.panel.is-open > .panel-body{grid-template-rows:1fr}
+.panel-body > .clip{overflow:hidden}
+/* While the panel is moving, the copy is faded out into the edge rather than
+   ending on a hard slice, so it reads as passing behind the panel below. The
+   mask is only present during the movement — once open, the text is crisp. */
+.panel.is-moving > .panel-body > .clip{
+  -webkit-mask-image:linear-gradient(to bottom, #000 calc(100% - var(--veil)), transparent 100%);
+          mask-image:linear-gradient(to bottom, #000 calc(100% - var(--veil)), transparent 100%);
+}
+.panel-inner{
+  max-width:1040px; margin:0 auto; text-align:center;
+  padding:0 var(--gutter) clamp(44px, 5.4vw, 88px);
+  font-size:var(--fs-client); line-height:var(--lh-copy); letter-spacing:-0.005em;
+  opacity:0; transition:opacity var(--dur) var(--ease);
+}
+.panel.is-open > .panel-body .panel-inner{opacity:1}
+.panel-inner p{margin:0}
+.panel-inner p + p{margin-top:1.1em}
+#panel-intro .panel-inner{font-size:var(--fs-intro)}
+
+/* ---------------- footer ---------------- */
+.outro{border-top:1px solid rgba(255,255,255,.6)}
+.outro .inner{
+  color:var(--ink-dark);          /* same darker grey as Contact / Connect */
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; gap:clamp(26px, 3.4vw, 48px);
+  padding:clamp(64px, 9vw, 140px) var(--gutter);
+  font-size:var(--fs-client); line-height:var(--lh-copy); letter-spacing:-0.005em;
+}
+/* 49ch = 985px at 24pt. The line up to "organisations" measures 950px and
+   adding " and" takes it to 1023px, so the break lands where it should with
+   about 35px of slack on either side. */
+.outro p{margin:0; max-width:49ch}
+.outro .cta{font-size:1em}
+
+@media (max-width:760px){
+  .topbar .worded{display:none}
+  .icon-links{display:flex}
+  .topbar{justify-content:flex-end}
+  .outro p{max-width:24ch}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{transition-duration:1ms !important}
+}
+
+/* ---------------------------------------------------------------------------
+   Left-aligned variant — TEMPORARY, for comparing the two layouts.
+   Everything below is scoped to [data-align="left"] or the toggle itself, so
+   this block and the matching one in site.js can be deleted together once a
+   direction is chosen. Nothing here affects the centred layout.
+   --------------------------------------------------------------------------- */
+:root{
+  /* The same gutter the topbar uses, so the left edge of the hero, the logos
+     and the copy all line up with "Contact" above them. */
+  --inset:var(--gutter);
+}
+
+:root[data-align="left"] .hero-type{
+  align-items:flex-start; text-align:left;
+  padding-left:var(--inset); padding-right:var(--inset);
+}
+:root[data-align="left"] .panel-head{
+  justify-content:flex-start;
+  padding-left:var(--inset); padding-right:var(--inset);
+}
+:root[data-align="left"] .panel-inner{
+  margin:0; text-align:left;
+  padding-left:var(--inset); padding-right:var(--inset);
+}
+:root[data-align="left"] .outro .inner{
+  align-items:flex-start; text-align:left;
+  padding-left:var(--inset); padding-right:var(--inset);
+}
+
+.align-toggle{
+  position:fixed; right:18px; bottom:18px; z-index:50;
+  font-family:Poppins, system-ui, sans-serif; font-size:11px; font-weight:600;
+  letter-spacing:.08em; text-transform:uppercase;
+  padding:11px 16px; border-radius:999px; border:1px solid rgba(0,0,0,.10);
+  background:rgba(255,255,255,.88); color:var(--ink-dark); cursor:pointer;
+  -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+  box-shadow:0 2px 12px rgba(0,0,0,.08);
+}
+.align-toggle:hover{background:#fff}

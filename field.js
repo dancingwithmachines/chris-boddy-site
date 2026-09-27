@@ -19,6 +19,9 @@ out vec4 fragColor;
 
 uniform vec2  uRes;
 uniform float uTime;
+// Reference aspect the field is composed for. 0 stretches the field to fill the
+// canvas; a positive value holds that proportion and crops the overflow instead.
+uniform float uAspect;
 
 // ---- tunables ----
 uniform float uSeed;
@@ -61,6 +64,11 @@ vec2 distort(vec2 p, float offset, int iters, float t){
 
 vec4 shade(vec2 frag){
   vec2 uv = frag / uRes;
+
+  // A band wider than the reference aspect would otherwise squash the field
+  // vertically. Scaling uv.y by the ratio keeps the vertical proportion and
+  // shows a centred slice of the field instead.
+  if(uAspect > 0.0) uv.y = (uv.y - 0.5) * (uRes.y / uRes.x) * uAspect + 0.5;
 
   vec2 q = uv - 0.5;
   float ca = cos(uAngle), sa = sin(uAngle);
@@ -126,7 +134,7 @@ void main(){
     scale:3.62, stretch:1.00, angle:0, offset:0.50,
     detail:3, rough:1.10, warp:0.41,
     soft:11.0, disp:0.260, chroma:0.80, shape:0.85, coreMix:0.00, intensity:0.75,
-    speed:0.50, seed:161.91636, text:true
+    speed:0.40, seed:161.91636, text:true
   };
 
   const PARAMS = [
@@ -146,7 +154,7 @@ void main(){
     {k:'speed',     label:'Flow',       min:0,    max:3,    step:0.01,  dp:2, group:'motion'}
   ];
 
-  const UNIFORMS = ['uRes','uTime','uSeed','uHsvA','uHsvB','uCore','uBg','uAngle',
+  const UNIFORMS = ['uRes','uTime','uAspect','uSeed','uHsvA','uHsvB','uCore','uBg','uAngle',
     'uScale','uStretch','uWarp','uOffset','uDetail','uRough','uShape','uChroma',
     'uSoft','uDisp','uCoreMix','uIntensity'];
 
@@ -181,7 +189,10 @@ void main(){
     return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
   }
 
-  function create(canvas, host){
+  // opts.aspect: reference aspect for the crop above. A function is re-read every
+  // frame, so a band can track another element's proportions as the page resizes.
+  function create(canvas, host, opts){
+    const aspectOf = (opts && opts.aspect) || 0;
     const gl = canvas.getContext('webgl2', {antialias:false, alpha:false,
                                             powerPreference:'high-performance'});
     if(!gl) return null;
@@ -227,11 +238,13 @@ void main(){
 
     let state = Object.assign({}, DEFAULTS);
     let playing = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let clock = 40.0, last = performance.now(), raf = 0;
+    let clock = 40.0, last = performance.now(), raf = 0, active = true;
 
     function push(){
       const ends = hueEnds(state.a, state.b);
       gl.uniform2f(U.uRes, W, H);
+      const ar = typeof aspectOf === 'function' ? aspectOf() : aspectOf;
+      gl.uniform1f(U.uAspect, ar > 0 ? ar : 0);
       gl.uniform1f(U.uSeed, state.seed);
       gl.uniform3fv(U.uHsvA, ends[0]);
       gl.uniform3fv(U.uHsvB, ends[1]);
@@ -269,6 +282,15 @@ void main(){
       set: function(next){ Object.assign(state, next); },
       get playing(){ return playing; },
       setPlaying: function(v){ playing = !!v; },
+      // A page can carry more than one field. Stopping the loop for the ones
+      // that are scrolled out of view keeps only the visible shader running.
+      setActive: function(v){
+        v = !!v;
+        if(v === active) return;
+        active = v;
+        if(active){ last = performance.now(); raf = requestAnimationFrame(frame); }
+        else { cancelAnimationFrame(raf); raf = 0; }
+      },
       exportGLSL: exportGLSL.bind(null, function(){ return state; })
     };
   }
