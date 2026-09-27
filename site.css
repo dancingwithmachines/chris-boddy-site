@@ -67,10 +67,10 @@ img{max-width:100%; display:block}
 .field > .inner{position:relative}
 
 /* ---------------- header ---------------- */
-/* 80% of the viewport, so the introduction panel is already breaking the
+/* 85% of the viewport, so the introduction panel is already breaking the
    bottom edge on load. svh keeps it honest on phones, where vh counts the
    address bar that is about to disappear. */
-.hero{height:80vh; height:80svh; display:flex; flex-direction:column}
+.hero{height:85vh; height:85svh; display:flex; flex-direction:column}
 .topbar{
   position:relative; display:flex; justify-content:space-between; align-items:center;
   gap:16px; padding:clamp(16px, 2.4vw, 30px) var(--gutter);
