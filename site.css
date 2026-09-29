@@ -195,6 +195,14 @@ img{max-width:100%; display:block}
 .panel-inner p + p{margin-top:1.1em}
 #panel-intro .panel-inner{font-size:var(--fs-intro)}
 
+/* The disciplines open each client panel, so they carry more weight than the
+   copy below them. The introduction and Elsewhere open straight into prose,
+   so they are left alone. */
+#panel-google .panel-inner p:first-child,
+#panel-pentagram .panel-inner p:first-child,
+#panel-dyson .panel-inner p:first-child,
+#panel-apple .panel-inner p:first-child{font-weight:600}
+
 /* ---------------- footer ---------------- */
 .outro{border-top:1px solid rgba(255,255,255,.6)}
 .outro .inner{
