@@ -204,10 +204,9 @@ img{max-width:100%; display:block}
   padding:clamp(64px, 9vw, 140px) var(--gutter);
   font-size:var(--fs-client); line-height:var(--lh-copy); letter-spacing:-0.005em;
 }
-/* 49ch = 985px at 24pt. The line up to "organisations" measures 950px and
-   adding " and" takes it to 1023px, so the break lands where it should with
-   about 35px of slack on either side. */
-.outro p{margin:0; max-width:49ch}
+/* The sentence sets at 1006px at 24pt, so 52ch (1045px) keeps it on one line
+   with a little slack rather than dropping "world." on its own. */
+.outro p{margin:0; max-width:52ch}
 .outro .cta{font-size:1em}
 
 @media (max-width:760px){
