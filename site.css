@@ -242,3 +242,43 @@ img{max-width:100%; display:block}
 @media (prefers-reduced-motion:reduce){
   *{transition-duration:1ms !important}
 }
+
+/* ---------------------------------------------------------------------------
+   Left-aligned variant — TEMPORARY, for comparing the two layouts.
+   Everything below is scoped to [data-align="left"] or the toggle itself, so
+   this block and the matching one in site.js can be deleted together once a
+   direction is chosen. Nothing here affects the centred layout.
+   --------------------------------------------------------------------------- */
+:root{
+  /* The same gutter the topbar uses, so the left edge of the hero, the logos
+     and the copy all line up with "Contact" above them. */
+  --inset:var(--gutter);
+}
+
+:root[data-align="left"] .hero-type{
+  align-items:flex-start; text-align:left;
+  padding-left:var(--inset); padding-right:var(--inset);
+}
+:root[data-align="left"] .panel-head{
+  justify-content:flex-start;
+  padding-left:var(--inset); padding-right:var(--inset);
+}
+:root[data-align="left"] .panel-inner{
+  margin:0; text-align:left;
+  padding-left:var(--inset); padding-right:var(--inset);
+}
+:root[data-align="left"] .outro .inner{
+  align-items:flex-start; text-align:left;
+  padding-left:var(--inset); padding-right:var(--inset);
+}
+
+.align-toggle{
+  position:fixed; right:18px; bottom:18px; z-index:50;
+  font-family:Poppins, system-ui, sans-serif; font-size:11px; font-weight:600;
+  letter-spacing:.08em; text-transform:uppercase;
+  padding:11px 16px; border-radius:999px; border:1px solid rgba(0,0,0,.10);
+  background:rgba(255,255,255,.88); color:var(--ink-dark); cursor:pointer;
+  -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+  box-shadow:0 2px 12px rgba(0,0,0,.08);
+}
+.align-toggle:hover{background:#fff}
