@@ -27,15 +27,20 @@
   /* Sized so "Copywriting, narrative" keeps its line break at every width:
      the break needs roughly 7.9vw, and it tops out at the designed 60pt. */
   --fs-hero:clamp(24px, 7.9vw, 56pt);
-  /* mobile 16pt -> desktop 24pt. Same value for both now, kept as two
+  /* mobile 14pt -> desktop 20pt. Same value for both now, kept as two
      variables so they can diverge again without touching the rules. */
-  --fs-intro:clamp(16pt, 2.67vw, 24pt);
-  --fs-client:clamp(16pt, 2.67vw, 24pt);
-  /* Leading is held at 32pt desktop / 24pt mobile. It has to be an absolute
-     clamp rather than a unitless ratio, because 17/24 on mobile and 24/32 on
-     desktop are different proportions. Used by the panel copy and the footer
-     copy alike. */
-  --lh-copy:clamp(24pt, 3.56vw, 32pt);
+  --fs-intro:clamp(14pt, 2.22vw, 20pt);
+  --fs-client:clamp(14pt, 2.22vw, 20pt);
+  /* Leading is 26.67pt desktop / 20pt mobile: desktop keeps its 1:1.333, and
+     mobile sits a touch looser at 1:1.43, which small text wants. An absolute
+     clamp rather than a unitless ratio, because the two ends differ. Used by
+     the panel copy and the footer copy alike. */
+  --lh-copy:clamp(20pt, 2.96vw, 26.67pt);
+  /* The footer matches the panel copy at both ends. Kept as its own tokens
+     rather than reusing the panel ones, so the two can be moved apart again
+     without one dragging the other. */
+  --fs-outro:clamp(14pt, 2.22vw, 20pt);
+  --lh-outro:clamp(20pt, 2.96vw, 26.67pt);
   /* mobile 18pt -> desktop 18pt for the small stuff */
   --fs-meta:clamp(11pt, 1.1vw, 13pt);
   /* mobile 12pt -> desktop 16pt. 1.78vw tops out at 1200px, the same width the
@@ -210,7 +215,7 @@ img{max-width:100%; display:block}
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   text-align:center; gap:clamp(26px, 3.4vw, 48px);
   padding:clamp(64px, 9vw, 140px) var(--gutter);
-  font-size:var(--fs-client); line-height:var(--lh-copy); letter-spacing:-0.005em;
+  font-size:var(--fs-outro); line-height:var(--lh-outro); letter-spacing:-0.005em;
 }
 /* 42ch = 844px at 24pt, chosen to break the line after "organisations": that
    much of the sentence measures 804px and adding " and" takes it to 876px, so
@@ -222,7 +227,10 @@ img{max-width:100%; display:block}
   .topbar .worded{display:none}
   .icon-links{display:flex}
   .topbar{justify-content:flex-end}
-  .outro p{max-width:24ch}
+  /* 24ch left "world." stranded on a fourth line. 27ch sets it in three with
+     four words on the last, and sits mid-way through the 26-28ch band that
+     gives that break, so it holds rather than flipping. */
+  .outro p{max-width:27ch}
 }
 
 /* Used for a beat while JS measures a settled layout; see closedHeadHeight(). */
