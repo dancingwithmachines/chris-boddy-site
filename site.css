@@ -24,9 +24,12 @@
   --ease:cubic-bezier(0.77, 0, 0.175, 1);   /* quart in-out */
   --dur:620ms;
 
-  /* Sized so "Copywriting, narrative" keeps its line break at every width:
-     the break needs roughly 7.9vw, and it tops out at the designed 60pt. */
-  --fs-hero:clamp(24px, 7.9vw, 56pt);
+  /* Sized so "Copywriting, narrative" keeps its line break at every width.
+     7.52vw puts a 390px phone on 22pt and tops out at the designed 50pt; the
+     24px floor is for anything narrower, where the break needs the type to
+     keep shrinking. Leading is the unitless 1.14 on .hero-type, so it stays
+     proportional at every size. */
+  --fs-hero:clamp(24px, 7.52vw, 50pt);
   /* mobile 14pt -> desktop 20pt. Same value for both now, kept as two
      variables so they can diverge again without touching the rules. */
   --fs-intro:clamp(14pt, 2.22vw, 20pt);
