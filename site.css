@@ -51,7 +51,11 @@
   --fs-label:clamp(12pt, 1.78vw, 16pt);
 
   --gutter:clamp(20px, 5vw, 64px);
-  --panel-pad:clamp(44px, 5.4vw, 88px);   /* space under a panel's copy */
+  /* Space under a panel's copy: a shade more than the measure above it, so the
+     copy is not pressed against the panel below. Derived rather than set, so
+     the whole panel's spacing moves from one number. */
+  --panel-pad:calc(var(--gap-open) * 2.25);
+  --gap-open:clamp(14px, 1.7vw, 24px);    /* tightened space inside an open head */
   --veil:clamp(36px, 5vh, 72px);   /* softened edge while a panel moves */
   color-scheme:light;
 }
@@ -154,7 +158,14 @@ img{max-width:100%; display:block}
 }
 
 /* open: the head joins the white body and its label goes pale blue */
-.panel.is-open > .panel-head{background:var(--white); color:var(--label-open)}
+/* Once open, the head is just the logo sitting above the copy, so its full
+   button padding reads as a gap. Closing it up by about half ties the two
+   together. Closed heads keep their original padding, and the introduction
+   has its own rule below. */
+.panel.is-open > .panel-head{
+  background:var(--white); color:var(--label-open);
+  padding-bottom:var(--gap-open);
+}
 .panel.is-open > .panel-head:hover{background:var(--white)}
 
 /* The introduction panel alone drops its title once open, leaving only the
@@ -173,9 +184,11 @@ img{max-width:100%; display:block}
 
 #panel-intro.is-open > .panel-head{
   color:transparent; line-height:0;
-  /* the title has gone, so what is left is space: match the space below the copy */
-  padding-top:calc(var(--panel-pad) / 2);
-  padding-bottom:calc(var(--panel-pad) / 2);
+  /* With the title gone this head is nothing but space. It used to match the
+     padding under the copy, which read as a hole now the logo panels have
+     tightened, so it takes the same measure they do. */
+  padding-top:var(--gap-open);
+  padding-bottom:var(--gap-open);
 }
 
 /* the 0fr -> 1fr grid transition animates height without measuring it in JS */
