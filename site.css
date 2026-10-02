@@ -258,6 +258,15 @@ img{max-width:100%; display:block}
 .outro p{margin:0; max-width:42ch}
 .outro .cta{font-size:1em}
 
+/* On a narrow, tall screen the last panels run out of page to scroll against,
+   so they stop short of the top. Giving the footer a floor in viewport units
+   covers it: the shortfall grows with screen height, so the remedy has to as
+   well, and a fixed padding that worked on one phone fell short on a taller
+   one. The field fills the extra, and desktop reaches the top unaided. */
+@media (max-width:900px){
+  .outro{min-height:70vh; min-height:70svh}
+}
+
 @media (max-width:760px){
   .topbar .worded{display:none}
   .icon-links{display:flex}
