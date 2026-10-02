@@ -1,2 +1,7 @@
 .DS_Store
 .claude/
+
+# The tuner stays on disk so it can be run locally against the same field.js,
+# but it is not part of the published site.
+tuner.html
+tuner.js
